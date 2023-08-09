@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --quiet --fix --ignore-path .gitignore",
     "build": "tsc",
-    "test": "npx tsx src/__test__/*.test.ts"
+    "test": "node --loader tsx --test src/**/*.test.ts"
   },
   "keywords": [],
   "author": "",
