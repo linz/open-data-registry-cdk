@@ -5,13 +5,15 @@
   "private": true,
   "scripts": {
     "lint": "eslint . --quiet --fix --ignore-path .gitignore",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "npx tsx src/__test__/*.test.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@linzjs/style": "^4.2.0",
+    "@types/node": "^20.4.9",
     "aws-cdk": "^2.90.0",
     "aws-cdk-lib": "^2.90.0",
     "constructs": "^10.2.69",

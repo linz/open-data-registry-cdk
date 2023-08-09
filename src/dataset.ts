@@ -11,6 +11,7 @@ import {
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
+import { tryGetContextArn } from './arn.js';
 import { titleCase } from './names.js';
 
 export class OdrDatasets extends Stack {
@@ -115,11 +116,12 @@ export class OdrDatasets extends Stack {
 
   /** Create a role that can read log records */
   setupLogReader(): void {
-    const logReaderBastionArn = this.node.tryGetContext('log-reader-role-arn');
+    const logReaderBastionArn = tryGetContextArn(this, 'log-reader-role-arn');
     if (logReaderBastionArn == null) {
       console.error('Unable to create logging role as "log-reader-role-arn" is not set.');
       return;
     }
+
     const loggingReadRole = new Role(this, 'LogReader', { assumedBy: new ArnPrincipal(logReaderBastionArn) });
     this.logBucket.grantRead(loggingReadRole);
 
@@ -128,7 +130,7 @@ export class OdrDatasets extends Stack {
 
   /** Create a role that can publish new data into the open data bucket */
   setupDataManager(): void {
-    const dataManagerBastionArn = this.node.tryGetContext('data-manager-role-arn');
+    const dataManagerBastionArn = tryGetContextArn(this, 'data-manager-role-arn');
     if (dataManagerBastionArn == null) {
       console.error('Unable to create data manager role as "data-manager-role-arn" is not set.');
       return;
