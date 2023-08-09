@@ -1,8 +1,12 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { ArnPrincipal, ManagedPolicy, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import { tryGetContextArn } from './arn.js';
+import { tryGetContextArn } from './util/arn.js';
 
+/**
+ * Stack to grant access to a remote roles to have access to either
+ * "ReadOnlyAccess" or "AdministratorAccess" in the ODR account
+ */
 export class OdrConsole extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);

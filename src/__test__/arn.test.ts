@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { validateRoleArn } from '../arn.js';
+import { validateRoleArn } from '../util/arn.js';
 
 describe('roleArnValidator', () => {
   it('should error if arn is not a valid role', () => {

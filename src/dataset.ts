@@ -1,21 +1,13 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { AnyPrincipal, ArnPrincipal, Effect, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
-import {
-  BlockPublicAccess,
-  Bucket,
-  BucketAccessControl,
-  EventType,
-  HttpMethods,
-  StorageClass,
-} from 'aws-cdk-lib/aws-s3';
+import { AnyPrincipal, ArnPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
+import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
-import { tryGetContextArn } from './arn.js';
-import { titleCase } from './names.js';
+import { tryGetContextArn } from './util/arn.js';
+import { titleCase } from './util/names.js';
 
 export class OdrDatasets extends Stack {
-  /** Bucket where the data is stored  generally the same as `datasetName` */
   datasets: {
     /** Dataset name @example "nz-imagery" */
     name: string;
@@ -65,7 +57,7 @@ export class OdrDatasets extends Stack {
           },
         }),
       );
-
+      // 🚨 This bucket is public! 🚨
       const bucket = new Bucket(this, 'Data' + datasetTitle, {
         bucketName: datasetName,
         // Keep older versions but expire them after 30 days incase of accidental delete.
@@ -90,6 +82,15 @@ export class OdrDatasets extends Stack {
           },
         ],
 
+        // 🚨 This allows bucket to be public! 🚨
+        // Slightly weird way of making public bucket due to https://github.com/aws/aws-cdk/issues/25358
+        blockPublicAccess: new BlockPublicAccess({
+          blockPublicAcls: false,
+          blockPublicPolicy: false,
+          ignorePublicAcls: false,
+          restrictPublicBuckets: false,
+        }),
+
         // Standard CORS setup from https://s3-us-west-2.amazonaws.com/opendata.aws/pds-bucket-cf.yml
         cors: [
           {
@@ -102,8 +103,18 @@ export class OdrDatasets extends Stack {
         ],
       });
 
+      // 🚨 This makes the bucket public! 🚨
+      bucket.addToResourcePolicy(
+        new PolicyStatement({
+          actions: ['s3:List*', 's3:Get*'],
+          effect: Effect.ALLOW,
+          principals: [new StarPrincipal()],
+          resources: [bucket.bucketArn, bucket.arnForObjects('*')],
+        }),
+      );
+
       // Put `object_created` events into the sns topic
-      bucket.addEventNotification(EventType.OBJECT_CREATED, new SnsDestination(topic));
+      bucket.addObjectCreatedNotification(new SnsDestination(topic));
 
       new CfnOutput(this, 'Bucket' + datasetTitle, { value: bucket.bucketName });
 
@@ -138,7 +149,10 @@ export class OdrDatasets extends Stack {
 
     const dataManagerRole = new Role(this, 'DataManager', { assumedBy: new ArnPrincipal(dataManagerBastionArn) });
 
-    for (const dataset of this.datasets) dataset.bucket.grantReadWrite(dataManagerRole);
+    for (const dataset of this.datasets) {
+      dataset.bucket.grantReadWrite(dataManagerRole);
+      dataset.bucket.grantPutAcl(dataManagerRole); // https://github.com/aws/aws-cdk/issues/25358
+    }
     this.logBucket.grantRead(dataManagerRole);
 
     new CfnOutput(this, 'DataManagerArn', { value: dataManagerRole.roleArn });

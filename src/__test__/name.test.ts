@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { titleCase } from '../names.js';
+import { titleCase } from '../util/names.js';
 
 describe('titleCase', () => {
   it('should title case from dash case', () => {

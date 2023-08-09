@@ -2,9 +2,11 @@
  * Convert strings into title case
  *
  * @example
- * `linz-imagery-bucket` => `LinzImageryBucket`
- * `linz_imagery_bucket` => `LinzImageryBucket`
- * `linz imagery bucket` => `LinzImageryBucket`
+ * ```typescript
+ * titleCase("linz-imagery-bucket") // "LinzImageryBucket"
+ * titleCase("linz_imagery_bucket") // "LinzImageryBucket"
+ * titleCase("linz imagery bucket") // "LinzImageryBucket"
+ * ```
  *
  * @param text String to title case
  * @returns titled case string

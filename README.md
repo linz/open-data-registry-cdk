@@ -73,7 +73,7 @@ npx cdk deploy Console
 
 To allow customization about which roles and accounts are allowed to assume which roles there are a number of context variables
 
-They are accessed by adding `--context :name=:value` for example `npx cdk deploy Datasets --context dataset-suffix=test`
+They are accessed by adding `--context :name=:value` for example `npx cdk deploy Datasets --context dataset-suffix=-test`
 
 Dataset management context
 
