@@ -11,25 +11,29 @@ import {
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
+import { titleCase } from './names.js';
 
-export class OdrDataset extends Stack {
-  /** Name of the dataset @example "nz-imagery" */
-  datasetName: string;
+export class OdrDatasets extends Stack {
   /** Bucket where the data is stored  generally the same as `datasetName` */
-  bucket: Bucket;
+  datasets: {
+    /** Dataset name @example "nz-imagery" */
+    name: string;
+    /** Dataset storage bucket @example "s3://nz-imagery" */
+    bucket: Bucket;
+    /** SNS topic for object created events @example "nz-imagery-object_created" */
+    topic: Topic;
+  }[];
   /** Bucket where S3 access logs are stored */
   logBucket: Bucket;
-  /** SNS topic for s3 `object_created` events */
-  topic: Topic;
 
-  constructor(scope: Construct, id: string, props: StackProps & { datasetName: string }) {
+  constructor(scope: Construct, id: string, props: StackProps & { datasets: string[]; logBucketName: string }) {
     super(scope, id, props);
 
-    this.datasetName = props.datasetName;
-    if (this.datasetName.includes('.')) throw new Error(`Dataset name must not contain ".": ${this.datasetName}`);
+    // Allow testing with `--context dataset-suffix="-non-prod"`
+    const suffix = scope.node.tryGetContext('dataset-suffix') ?? '';
 
     this.logBucket = new Bucket(this, 'Logs', {
-      bucketName: `${this.datasetName}-logs`,
+      bucketName: props.logBucketName + suffix,
       // Only logs can be written to this bucket
       accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
@@ -37,65 +41,73 @@ export class OdrDataset extends Stack {
       lifecycleRules: [{ expiration: Duration.days(30) }],
     });
 
-    this.topic = new Topic(this, 'ObjectCreated', {
-      topicName: `${this.datasetName}-object_created`,
-    });
+    this.datasets = props.datasets.map((ds) => {
+      const datasetName = ds + suffix;
+      if (datasetName.includes('.')) throw new Error(`Dataset name must not contain ".": ${datasetName}`);
+      const datasetTitle = titleCase(datasetName);
 
-    // Allow any AWS Lambda or AWS SQS to listen to `object_created` events
-    this.topic.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: ['sns:Subscribe', 'sns:Receive'],
-        principals: [new AnyPrincipal()],
-        conditions: {
-          StringEquals: {
-            'SNS:Protocol': ['sqs', 'lambda'],
+      const topic = new Topic(this, 'ObjectCreated' + datasetTitle, {
+        topicName: `${datasetName}-object_created`,
+      });
+
+      // Allow any AWS Lambda or AWS SQS to listen to `object_created` events
+      topic.addToResourcePolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ['sns:Subscribe', 'sns:Receive'],
+          principals: [new AnyPrincipal()],
+          resources: [topic.topicArn],
+          conditions: {
+            StringEquals: {
+              'SNS:Protocol': ['sqs', 'lambda'],
+            },
           },
-        },
-      }),
-    );
+        }),
+      );
 
-    this.bucket = new Bucket(this, 'Data', {
-      bucketName: this.datasetName,
-      // Keep older versions but expire them after 30 days incase of accidental delete.
-      versioned: true,
+      const bucket = new Bucket(this, 'Data' + datasetTitle, {
+        bucketName: datasetName,
+        // Keep older versions but expire them after 30 days incase of accidental delete.
+        versioned: true,
 
-      // Write the access logs into this.logBucket
-      serverAccessLogsBucket: this.logBucket,
-      serverAccessLogsPrefix: `s3_${this.datasetName}/`,
+        // Write the access logs into this.logBucket
+        serverAccessLogsBucket: this.logBucket,
+        serverAccessLogsPrefix: `s3_${datasetName}/`,
 
-      // If the stack gets deleted don't delete the data!
-      removalPolicy: RemovalPolicy.RETAIN,
+        // If the stack gets deleted don't delete the data!
+        removalPolicy: RemovalPolicy.RETAIN,
 
-      lifecycleRules: [
-        {
-          // Ensure files are in infrequent access
-          transitions: [{ storageClass: StorageClass.INFREQUENT_ACCESS, transitionAfter: Duration.days(0) }],
-          // Delete any old versions of files
-          noncurrentVersionExpiration: Duration.days(30),
-          expiredObjectDeleteMarker: true,
-          // Ensure incomplete uploads are deleted
-          abortIncompleteMultipartUploadAfter: Duration.days(7),
-        },
-      ],
+        lifecycleRules: [
+          {
+            // Ensure files are in intelligent tiering access
+            transitions: [{ storageClass: StorageClass.INTELLIGENT_TIERING, transitionAfter: Duration.days(0) }],
+            // Delete any old versions of files after 30 days
+            noncurrentVersionExpiration: Duration.days(30),
+            expiredObjectDeleteMarker: true,
+            // Ensure incomplete uploads are deleted
+            abortIncompleteMultipartUploadAfter: Duration.days(7),
+          },
+        ],
 
-      // Standard CORS setup from https://s3-us-west-2.amazonaws.com/opendata.aws/pds-bucket-cf.yml
-      cors: [
-        {
-          maxAge: 3000,
-          allowedHeaders: ['*'],
-          allowedMethods: [HttpMethods.GET, HttpMethods.HEAD],
-          allowedOrigins: ['*'],
-          exposedHeaders: ['ETag', 'x-amz-meta-custom-header'],
-        },
-      ],
+        // Standard CORS setup from https://s3-us-west-2.amazonaws.com/opendata.aws/pds-bucket-cf.yml
+        cors: [
+          {
+            maxAge: 3000,
+            allowedHeaders: ['*'],
+            allowedMethods: [HttpMethods.GET, HttpMethods.HEAD],
+            allowedOrigins: ['*'],
+            exposedHeaders: ['ETag', 'x-amz-meta-custom-header'],
+          },
+        ],
+      });
+
+      // Put `object_created` events into the sns topic
+      bucket.addEventNotification(EventType.OBJECT_CREATED, new SnsDestination(topic));
+
+      new CfnOutput(this, 'Bucket' + datasetTitle, { value: bucket.bucketName });
+
+      return { name: datasetName, bucket, topic };
     });
-
-    // Put `object_created` events into the sns topic
-    this.bucket.addEventNotification(EventType.OBJECT_CREATED, new SnsDestination(this.topic));
-
-    new CfnOutput(this, 'Bucket', { value: this.bucket.bucketName });
-    new CfnOutput(this, 'BucketLog', { value: this.logBucket.bucketName });
 
     this.setupLogReader();
     this.setupDataManager();
@@ -108,10 +120,7 @@ export class OdrDataset extends Stack {
       console.error('Unable to create logging role as "log-reader-role-arn" is not set.');
       return;
     }
-    const loggingReadRole = new Role(this, 'LogReader', {
-      assumedBy: new ArnPrincipal(logReaderBastionArn),
-      roleName: `s3-${this.datasetName}-log-read`,
-    });
+    const loggingReadRole = new Role(this, 'LogReader', { assumedBy: new ArnPrincipal(logReaderBastionArn) });
     this.logBucket.grantRead(loggingReadRole);
 
     new CfnOutput(this, 'LogReaderArn', { value: loggingReadRole.roleArn });
@@ -125,11 +134,9 @@ export class OdrDataset extends Stack {
       return;
     }
 
-    const dataManagerRole = new Role(this, 'DataManager', {
-      assumedBy: new ArnPrincipal(dataManagerBastionArn),
-      roleName: `s3-${this.datasetName}-data-manager`,
-    });
-    this.bucket.grantReadWrite(dataManagerRole);
+    const dataManagerRole = new Role(this, 'DataManager', { assumedBy: new ArnPrincipal(dataManagerBastionArn) });
+
+    for (const dataset of this.datasets) dataset.bucket.grantReadWrite(dataManagerRole);
     this.logBucket.grantRead(dataManagerRole);
 
     new CfnOutput(this, 'DataManagerArn', { value: dataManagerRole.roleArn });
