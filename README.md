@@ -9,7 +9,7 @@ LINZ has a collection of Satellite and Aerial imagery (~20TB compressed and grow
 
 AWS open data registry requires that the S3 bucket containing the datasets to be in a standalone AWS account, this account will be assoicated to a AWS Managed Organisation, This repository contains the AWS CDK infrastructure for bootstrapping of this new account and allowing LINZ users to access the standalone AWS account with their standard Single Sign On process.
 
-### Infrastructure
+## Infrastructure
 
 The base open data registry infrastructure contains 
 
@@ -19,13 +19,13 @@ The base open data registry infrastructure contains
 
 ![Base Infrastructure](./static/BaseInfra.png)
 
-## Console Access
+### Console Access
 
 To grant LINZ users access to the standalone AWS ODR account a LINZ managed bastion account is used. The bastion account contains two roles that are assoicated with LINZ Single Signon. `role/BastionOdrAdmin` and `role/BastionOdrReadOnly` these two roles have been given access ([console.ts](./src/console.ts)) to assume the corresponding `role/ConsoleAdmin` and `role/ConsoleReadOnly` roles inside of the LINZ ODR account.
 
 ![Console Access](./static/ConsoleAccess.png)
 
-## Data Publishing
+### Data Publishing
 
 LINZ uses a AWS EKS kubernetes cluster for all of it's imagery processing:
 
@@ -36,3 +36,52 @@ LINZ uses a AWS EKS kubernetes cluster for all of it's imagery processing:
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)), this role has the permission to write data into the main dataset bucket.
 
 ![Data Publishing](./static/DataPublishing.png)
+
+
+## Deployment
+
+The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk) 
+
+To deploy [NodeJs](https://nodejs.org/en) >=16.x is needed
+
+Install dependencies
+```
+npm install # install dependencies
+```
+
+List the current stacks
+```
+npx cdk ls
+```
+
+- Console - Console access stack
+- Datasets - Base dataset stacks + data publishing roles
+
+Diff the console access stack
+```bash
+npx cdk diff Console
+```
+
+Deploy the console stack
+```bash
+npx cdk deploy Console
+```
+
+## Context
+
+To allow customisation about which roles and accounts are allowed to assume which roles there are a number of context variables
+
+They are accessed by adding `--context :name=:value` for example `npx cdk deploy Datasets --context dataset-suffix=test`
+
+
+Dataset management context
+- `log-reader-role-arn` Role that can assume the S3 Access read logs role.
+- `data-manager-role-arn` Role that can assume the Data Maintainer role to read/write the dataset bucket.
+
+Console access context
+- `console-read-only-role-arn` Role that can assume the read only console role.
+- `console-admin-role-arn` Role that can assume the console admin role.
+
+### Testing Context
+
+- `dataset-suffix` - Allow deploying to testing account, by suffixing all named objects (S3 Bucket/SNS Topic)
