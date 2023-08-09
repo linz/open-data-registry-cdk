@@ -14,7 +14,7 @@ AWS open data registry requires that the S3 bucket containing the datasets to be
 The base open data registry infrastructure contains 
 
 - S3 Bucket `s3://nz-imagery` - Dataset Bucket where the open data is stored, it is publicly readable
-- SNS Topic `nz-imagery_object_created` - AWS S3 OBJECT_CREATED events are emitted from the 
+- SNS Topic `nz-imagery-object_created` - AWS S3 OBJECT_CREATED events are emitted from the 
 - S3 Bucket - Log Bucket, S3 Access logs from the dataset bucket are stored  here.
 
 ![Base Infrastructure](./static/BaseInfra.png)
