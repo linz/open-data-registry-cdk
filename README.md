@@ -1,21 +1,20 @@
 # LINZ Open Data Registry Setup
 
-
 ## Background
 
 LINZ has a collection of Satellite and Aerial imagery (~20TB compressed and growing). These files are currently stored as lossless WebP COGs with [STAC metadata](https://stacspec.org/en/) in AWS S3.
 
-[AWS Registry of Open Data](https://registry.opendata.aws/) (ODR/RODA) is a sponsorship process whereby AWS will pay for storage and egress costs for open data. 
+[AWS Registry of Open Data](https://registry.opendata.aws/) (ODR/RODA) is a sponsorship process whereby AWS will pay for storage and egress costs for open data.
 
 AWS open data registry requires that the S3 bucket containing the datasets to be in a standalone AWS account, this account will be assoicated to a AWS Managed Organisation, This repository contains the AWS CDK infrastructure for bootstrapping of this new account and allowing LINZ users to access the standalone AWS account with their standard Single Sign On process.
 
 ## Infrastructure
 
-The base open data registry infrastructure contains 
+The base open data registry infrastructure contains
 
 - S3 Bucket `s3://nz-imagery` - Dataset Bucket where the open data is stored, it is publicly readable
-- SNS Topic `nz-imagery-object_created` - AWS S3 OBJECT_CREATED events are emitted from the 
-- S3 Bucket - Log Bucket, S3 Access logs from the dataset bucket are stored  here.
+- SNS Topic `nz-imagery-object_created` - AWS S3 OBJECT_CREATED events are emitted from the
+- S3 Bucket - Log Bucket, S3 Access logs from the dataset bucket are stored here.
 
 ![Base Infrastructure](./static/BaseInfra.png)
 
@@ -37,19 +36,20 @@ This EKS Cluster has been given access to assume a role `role/DataMaintainer` in
 
 ![Data Publishing](./static/DataPublishing.png)
 
-
 ## Deployment
 
-The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk) 
+The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk)
 
 To deploy [NodeJs](https://nodejs.org/en) >=16.x is needed
 
 Install dependencies
+
 ```
 npm install # install dependencies
 ```
 
 List the current stacks
+
 ```
 npx cdk ls
 ```
@@ -58,27 +58,30 @@ npx cdk ls
 - Datasets - Base dataset stacks + data publishing roles
 
 Diff the console access stack
+
 ```bash
 npx cdk diff Console
 ```
 
 Deploy the console stack
+
 ```bash
 npx cdk deploy Console
 ```
 
 ## Context
 
-To allow customisation about which roles and accounts are allowed to assume which roles there are a number of context variables
+To allow customization about which roles and accounts are allowed to assume which roles there are a number of context variables
 
 They are accessed by adding `--context :name=:value` for example `npx cdk deploy Datasets --context dataset-suffix=test`
 
-
 Dataset management context
+
 - `log-reader-role-arn` Role that can assume the S3 Access read logs role.
 - `data-manager-role-arn` Role that can assume the Data Maintainer role to read/write the dataset bucket.
 
 Console access context
+
 - `console-read-only-role-arn` Role that can assume the read only console role.
 - `console-admin-role-arn` Role that can assume the console admin role.
 
