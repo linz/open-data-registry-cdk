@@ -4,7 +4,7 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageCla
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
-import { tryGetContextArn } from './util/arn.js';
+import { getArnPrincipal, tryGetContextArn, tryGetContextArns } from './util/arn.js';
 import { titleCase } from './util/names.js';
 
 export class OdrDatasets extends Stack {
@@ -127,13 +127,13 @@ export class OdrDatasets extends Stack {
 
   /** Create a role that can read log records */
   setupLogReader(): void {
-    const logReaderBastionArn = tryGetContextArn(this, 'log-reader-role-arn');
-    if (logReaderBastionArn == null) {
-      console.error('Unable to create logging role as "log-reader-role-arn" is not set.');
+    const logReaderArns = tryGetContextArn(this, 'log-reader-role-arns');
+    if (logReaderArns == null) {
+      console.error('Unable to create logging role as "log-reader-role-arns" is not set.');
       return;
     }
 
-    const loggingReadRole = new Role(this, 'LogReader', { assumedBy: new ArnPrincipal(logReaderBastionArn) });
+    const loggingReadRole = new Role(this, 'LogReader', { assumedBy: new ArnPrincipal(logReaderArns) });
     this.logBucket.grantRead(loggingReadRole);
 
     new CfnOutput(this, 'LogReaderArn', { value: loggingReadRole.roleArn });
@@ -141,13 +141,13 @@ export class OdrDatasets extends Stack {
 
   /** Create a role that can publish new data into the open data bucket */
   setupDataManager(): void {
-    const dataManagerBastionArn = tryGetContextArn(this, 'data-manager-role-arn');
-    if (dataManagerBastionArn == null) {
-      console.error('Unable to create data manager role as "data-manager-role-arn" is not set.');
+    const dataManagerArns = tryGetContextArns(this, 'data-manager-role-arns');
+    if (dataManagerArns == null) {
+      console.error('Unable to create data manager role as "data-manager-role-arns" is not set.');
       return;
     }
 
-    const dataManagerRole = new Role(this, 'DataManager', { assumedBy: new ArnPrincipal(dataManagerBastionArn) });
+    const dataManagerRole = new Role(this, 'DataManager', { assumedBy: getArnPrincipal(dataManagerArns) });
 
     for (const dataset of this.datasets) {
       dataset.bucket.grantReadWrite(dataManagerRole);
