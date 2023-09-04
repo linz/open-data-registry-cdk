@@ -77,13 +77,13 @@ They are accessed by adding `--context :name=:value`. For example `npx cdk deplo
 
 ### Dataset management context
 
-- `log-reader-role-arn` - Role that can assume the S3 Access read logs role.
-- `data-manager-role-arn` - Role that can assume the Data Maintainer role to read/write the dataset bucket.
+- `log-reader-role-arns` - Role(s) that can assume the S3 Access read logs role.
+- `data-manager-role-arns` - Role(s) that can assume the Data Maintainer role to read/write the dataset bucket.
 
 ### Console access context
 
-- `console-read-only-role-arn` - Role that can assume the read only console role.
-- `console-admin-role-arn` - Role that can assume the console admin role.
+- `console-read-only-role-arns` - Role(s) that can assume the read only console role.
+- `console-admin-role-arns` - Role(s) that can assume the console admin role.
 
 ### Testing Context
 
