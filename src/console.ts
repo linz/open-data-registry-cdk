@@ -14,7 +14,9 @@ export class OdrConsole extends Stack {
     /** Give a specific role in another account the ability to login as an readonly admin to view things like billing and metrics */
     const bastionReadOnlyArns = tryGetContextArns(this, 'console-read-only-role-arns');
     if (bastionReadOnlyArns != null) {
-      const consoleReadOnly = new Role(this, 'ConsoleReadOnly', { assumedBy: getArnPrincipal(bastionReadOnlyArns) });
+      const consoleReadOnly = new Role(this, 'ConsoleReadOnly', {
+        assumedBy: getArnPrincipal(bastionReadOnlyArns).withSessionTags(),
+      });
 
       consoleReadOnly.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('ReadOnlyAccess'));
       new CfnOutput(this, 'ConsoleReadOnlyArn', { value: consoleReadOnly.roleArn });
@@ -24,7 +26,9 @@ export class OdrConsole extends Stack {
     /** Give a specific role in another account the ability to login as an account admin */
     const bastionAdminArns = tryGetContextArns(this, 'console-admin-role-arns');
     if (bastionAdminArns != null) {
-      const consoleAdmin = new Role(this, 'ConsoleAdmin', { assumedBy: getArnPrincipal(bastionAdminArns) });
+      const consoleAdmin = new Role(this, 'ConsoleAdmin', {
+        assumedBy: getArnPrincipal(bastionAdminArns).withSessionTags(),
+      });
 
       consoleAdmin.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
       new CfnOutput(this, 'ConsoleAdminArn', { value: consoleAdmin.roleArn });

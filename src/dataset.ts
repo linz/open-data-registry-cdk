@@ -1,10 +1,10 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { AnyPrincipal, ArnPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
+import { AnyPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
-import { getArnPrincipal, tryGetContextArn, tryGetContextArns } from './util/arn.js';
+import { getArnPrincipal, tryGetContextArns } from './util/arn.js';
 import { titleCase } from './util/names.js';
 
 export class OdrDatasets extends Stack {
@@ -127,13 +127,15 @@ export class OdrDatasets extends Stack {
 
   /** Create a role that can read log records */
   setupLogReader(): void {
-    const logReaderArns = tryGetContextArn(this, 'log-reader-role-arns');
+    const logReaderArns = tryGetContextArns(this, 'log-reader-role-arns');
     if (logReaderArns == null) {
       console.error('Unable to create logging role as "log-reader-role-arns" is not set.');
       return;
     }
 
-    const loggingReadRole = new Role(this, 'LogReader', { assumedBy: new ArnPrincipal(logReaderArns) });
+    const loggingReadRole = new Role(this, 'LogReader', {
+      assumedBy: getArnPrincipal(logReaderArns).withSessionTags(),
+    });
     this.logBucket.grantRead(loggingReadRole);
 
     new CfnOutput(this, 'LogReaderArn', { value: loggingReadRole.roleArn });
@@ -147,7 +149,9 @@ export class OdrDatasets extends Stack {
       return;
     }
 
-    const dataManagerRole = new Role(this, 'DataManager', { assumedBy: getArnPrincipal(dataManagerArns) });
+    const dataManagerRole = new Role(this, 'DataManager', {
+      assumedBy: getArnPrincipal(dataManagerArns).withSessionTags(),
+    });
 
     for (const dataset of this.datasets) {
       dataset.bucket.grantReadWrite(dataManagerRole);
