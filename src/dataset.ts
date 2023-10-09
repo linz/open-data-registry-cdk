@@ -91,9 +91,6 @@ export class OdrDatasets extends Stack {
           restrictPublicBuckets: false,
         }),
 
-        // Serve the index.html doc by default
-        websiteIndexDocument: 'index.html',
-
         // Standard CORS setup from https://s3-us-west-2.amazonaws.com/opendata.aws/pds-bucket-cf.yml
         cors: [
           {
