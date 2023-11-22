@@ -140,6 +140,7 @@ export class OdrDatasets extends Stack {
 
     new CfnOutput(this, 'LogReaderArn', { value: loggingReadRole.roleArn });
   }
+
   /** Create a role that can publish new data into the open data bucket */
   setupDataManager(): void {
     const dataManagerArns = tryGetContextArns(this, 'data-manager-role-arns');
