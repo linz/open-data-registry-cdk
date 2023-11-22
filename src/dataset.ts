@@ -1,5 +1,5 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { AnyPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
+import { AccountPrincipal, AnyPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
@@ -153,12 +153,25 @@ export class OdrDatasets extends Stack {
       assumedBy: getArnPrincipal(dataManagerArns).withSessionTags(),
     });
 
+    const kxRole = this.SetupKxReadRole();
+
     for (const dataset of this.datasets) {
       dataset.bucket.grantReadWrite(dataManagerRole);
       dataset.bucket.grantPutAcl(dataManagerRole); // https://github.com/aws/aws-cdk/issues/25358
+      dataset.bucket.grantRead(kxRole);
     }
     this.logBucket.grantRead(dataManagerRole);
 
     new CfnOutput(this, 'DataManagerArn', { value: dataManagerRole.roleArn });
+  }
+
+  /**Create Kx read role so that Data can be loaded from the ODR bucket to the LINZ data Service */
+  SetupKxReadRole(): Role {
+    const kxRole = new Role(this, 'Kx', {
+      roleName: 'koordinates-s3-access-read',
+      assumedBy: new AccountPrincipal('276514628126'),
+    });
+    new CfnOutput(this, 'KxRoleReadArn', { value: kxRole.roleArn });
+    return kxRole;
   }
 }
