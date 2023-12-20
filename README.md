@@ -14,22 +14,22 @@ The base open data registry infrastructure contains:
 
 - S3 Bucket `s3://nz-imagery` - Dataset Bucket where the open data is stored. It is publicly readable.
 - SNS Topic `nz-imagery-object_created` - AWS S3 OBJECT_CREATED events are emitted from the Amazon Simple Notification Service (SNS).
-- S3 Bucket `TBD` - Log Bucket. It is where the S3 Access logs from the dataset bucket are stored.
+- S3 Bucket `s3://linz-odr-access-logs` - Log Bucket. It is where the S3 Access logs from the dataset bucket are stored.
 
 ![Base Infrastructure](./static/BaseInfra.png)
 
 ### Console Access
 
-To grant LINZ users access to the standalone AWS ODR account a LINZ managed bastion account is used. The bastion account contains two roles that are assoicated with LINZ Single Sign On. `role/BastionOdrAdmin` and `role/BastionOdrReadOnly` are the two roles that have been given access ([console.ts](./src/console.ts)) to assume the corresponding `role/ConsoleAdmin` and `role/ConsoleReadOnly` roles inside of the LINZ ODR account.
+To grant LINZ users access to the standalone AWS ODR account a LINZ managed bastion account is used. The bastion account contains two roles that are associated with LINZ Single Sign On. `role/BastionOdrAdmin` and `role/BastionOdrReadOnly` are the two roles that have been given access ([console.ts](./src/console.ts)) to assume the corresponding `role/ConsoleAdmin` and `role/ConsoleReadOnly` roles inside of the LINZ ODR account.
 
 ![Console Access](./static/ConsoleAccess.png)
 
 ### Data Publishing
 
-LINZ uses a AWS EKS kubernetes cluster for all of it's imagery processing:
+LINZ uses a AWS EKS kubernetes cluster for all of its imagery processing:
 
 - [linz/topo-workflows](https://github.com/linz/topo-workflows) - Argo Workflows
-- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utlity containers
+- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utility containers
 - [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery processing containers
 
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)). This role has the permission to write data into the main dataset bucket.
