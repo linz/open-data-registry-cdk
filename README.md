@@ -2,19 +2,34 @@
 
 ## Background
 
-LINZ has a collection of Satellite and Aerial imagery (~20TB compressed and growing). These files are currently stored as lossless WebP COGs with [STAC metadata](https://stacspec.org/en/) in AWS S3.
+LINZ has a growing collection of publicly available datasets:
+
+- ~500 GB of _elevation models_ in the form of Limited Error Raster Compression (LERC) Cloud Optimized GeoTIFFs (COGs)
+- ~20 TB of _satellite and aerial imagery_ in the form of losslessly compressed WebP COGs.
+
+These datasets are stored in AWS S3 with associated [STAC metadata](https://stacspec.org/).
 
 [AWS Registry of Open Data](https://registry.opendata.aws/) (ODR/RODA) is a sponsorship process whereby AWS will pay for storage and egress costs for open data.
 
-AWS Open Data Registry requires that the S3 bucket containing the datasets should be in a standalone AWS account associated to a AWS Managed Organisation. This repository contains the AWS CDK infrastructure for bootstrapping this account and allowing LINZ users to access it with their standard Single Sign On process.
+AWS Open Data Registry requires that the S3 buckets containing the datasets should be in a standalone AWS account associated to a AWS Managed Organisation. This repository contains the AWS CDK infrastructure for bootstrapping this account and allowing LINZ users to access it with their standard Single Sign On process.
 
 ## Infrastructure
 
-The base open data registry infrastructure contains:
+The base open data registry infrastructure contains the following infrastructure, grouped by data type.
 
-- S3 Bucket `s3://nz-imagery` - Dataset Bucket where the open data is stored. It is publicly readable.
-- SNS Topic `nz-imagery-object_created` - AWS S3 OBJECT_CREATED events are emitted from the Amazon Simple Notification Service (SNS).
-- S3 Bucket `s3://linz-odr-access-logs` - Log Bucket. It is where the S3 Access logs from the dataset bucket are stored.
+### Imagery
+
+- S3 Bucket `s3://nz-imagery` - Dataset Bucket where the satellite and aerial imagery open data is stored. It is publicly readable.
+- SNS Topic `nz-imagery-object_created` - AWS S3 `OBJECT_CREATED` events for the `nz-imagery` bucket are emitted from the Amazon Simple Notification Service (SNS).
+
+### Elevation
+
+- S3 Bucket `s3://nz-elevation` - Dataset Bucket where the elevation model open data is stored. It is publicly readable.
+- SNS Topic `nz-elevation-object_created` - AWS S3 `OBJECT_CREATED` events for the `nz-elevation` bucket are emitted from the Amazon Simple Notification Service (SNS).
+
+### Common
+
+- S3 Bucket `s3://linz-odr-access-logs` - Log Bucket. It is where the S3 Access logs from the dataset buckets are stored.
 
 ![Base Infrastructure](./static/BaseInfra.png)
 
@@ -26,11 +41,11 @@ To grant LINZ users access to the standalone AWS ODR account a LINZ managed bast
 
 ### Data Publishing
 
-LINZ uses a AWS EKS kubernetes cluster for all of its imagery processing:
+LINZ uses a AWS EKS kubernetes cluster for all of its elevation and imagery processing:
 
 - [linz/topo-workflows](https://github.com/linz/topo-workflows) - Argo Workflows
 - [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utility containers
-- [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery processing containers
+- [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery and elevation processing containers
 
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)). This role has the permission to write data into the main dataset bucket.
 
