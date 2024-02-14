@@ -3,3 +3,4 @@ build/
 cdk.out/
 cdk.context.json
 tsconfig.tsbuildinfo
+/node
