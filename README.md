@@ -55,7 +55,7 @@ This EKS Cluster has been given access to assume a role `role/DataMaintainer` in
 
 The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk).
 
-To deploy, [NodeJs](https://nodejs.org/en) >=16.x is needed.
+To deploy, [NodeJs](https://nodejs.org/en) >=22.x is needed.
 
 Install dependencies
 
