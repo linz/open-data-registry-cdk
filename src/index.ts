@@ -5,7 +5,7 @@ import { OdrDatasets } from './dataset.js';
 const app = new App();
 
 const env = { region: 'ap-southeast-2', account: '838278294040' };
-const datasets = ['nz-elevation', 'nz-imagery'];
+const datasets = ['nz-coastal', 'nz-elevation', 'nz-imagery', 'nz-topography'];
 const logBucketName = 'linz-odr-access-logs';
 
 new OdrConsole(app, 'Console', { env, description: 'Cross account AWS console access' });

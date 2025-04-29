@@ -27,6 +27,16 @@ The base open data registry infrastructure contains the following infrastructure
 - S3 Bucket `s3://nz-elevation` - Dataset Bucket where the elevation model open data is stored. It is publicly readable.
 - SNS Topic `nz-elevation-object_created` - AWS S3 `OBJECT_CREATED` events for the `nz-elevation` bucket are emitted from the Amazon Simple Notification Service (SNS).
 
+### Coastal Elevation
+
+- S3 Bucket `s3://nz-coastal` - Dataset Bucket where the Coastal Elevation is to be stored. It is publicly readable.
+- SNS Topic `nz-coastal-object_created` - AWS S3 `OBJECT_CREATED` events for the `nz-coastal` bucket are emitted from the Amazon Simple Notification Service (SNS).
+
+### Topography
+
+- S3 Bucket `s3://nz-topography` - Dataset Bucket where the topography vector tile open data is to be stored. It is publicly readable.
+- SNS Topic `nz-topography-object_created` - AWS S3 `OBJECT_CREATED` events for the `nz-topography` bucket are emitted from the Amazon Simple Notification Service (SNS).
+
 ### Common
 
 - S3 Bucket `s3://linz-odr-access-logs` - Log Bucket. It is where the S3 Access logs from the dataset buckets are stored.
