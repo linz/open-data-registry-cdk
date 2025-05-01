@@ -1,3 +1,4 @@
+import { applyTags, SecurityClassification } from '@linzjs/cdk-tags';
 import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { AccountPrincipal, AnyPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
@@ -60,7 +61,7 @@ export class OdrDatasets extends Stack {
       // 🚨 This bucket is public! 🚨
       const bucket = new Bucket(this, 'Data' + datasetTitle, {
         bucketName: datasetName,
-        // Keep older versions but expire them after 30 days incase of accidental delete.
+        // Keep older versions but expire them after 30 days in case of accidental delete.
         versioned: true,
 
         // Write the access logs into this.logBucket
@@ -101,6 +102,16 @@ export class OdrDatasets extends Stack {
             exposedHeaders: ['ETag', 'x-amz-meta-custom-header'],
           },
         ],
+      });
+
+      // add LINZ common AWS tags to bucket
+      applyTags(bucket, {
+        application: 'odr',
+        environment: 'prod',
+        group: 'li',
+        classification: SecurityClassification.Unclassified,
+        data: { isMaster: true, isPublic: true, role: 'archive' },
+        impact: 'moderate',
       });
 
       // 🚨 This makes the bucket public! 🚨
