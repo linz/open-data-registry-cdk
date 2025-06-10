@@ -85,7 +85,7 @@ export class OdrDatasets extends Stack {
             ],
             expiredObjectDeleteMarker: true,
             // Ensure incomplete uploads are deleted
-            abortIncompleteMultipartUploadAfter: Duration.days(7),
+            abortIncompleteMultipartUploadAfter: Duration.days(3),
           },
         ],
 
