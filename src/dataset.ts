@@ -61,7 +61,7 @@ export class OdrDatasets extends Stack {
       // 🚨 This bucket is public! 🚨
       const bucket = new Bucket(this, 'Data' + datasetTitle, {
         bucketName: datasetName,
-        // Keep older versions but expire them after 30 days in case of accidental delete.
+        // Keep older versions and move them into Deep Archive after 30 days in case of accidental delete.
         versioned: true,
 
         // Write the access logs into this.logBucket
@@ -75,11 +75,16 @@ export class OdrDatasets extends Stack {
           {
             // Ensure files are in intelligent tiering access
             transitions: [{ storageClass: StorageClass.INTELLIGENT_TIERING, transitionAfter: Duration.days(0) }],
-            // Delete any old versions of files after 30 days
-            noncurrentVersionExpiration: Duration.days(30),
+            // Retain noncurrent versions in Standard for 30 days, then move to Deep Archive
+            noncurrentVersionTransitions: [
+              {
+                storageClass: StorageClass.DEEP_ARCHIVE,
+                transitionAfter: Duration.days(30),
+              },
+            ],
             expiredObjectDeleteMarker: true,
             // Ensure incomplete uploads are deleted
-            abortIncompleteMultipartUploadAfter: Duration.days(7),
+            abortIncompleteMultipartUploadAfter: Duration.days(3),
           },
         ],
 
