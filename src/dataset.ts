@@ -80,7 +80,6 @@ export class OdrDatasets extends Stack {
               {
                 storageClass: StorageClass.DEEP_ARCHIVE,
                 transitionAfter: Duration.days(30),
-                noncurrentVersionsToRetain: 100,
               },
             ],
             expiredObjectDeleteMarker: true,
