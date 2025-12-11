@@ -1,7 +1,7 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { ManagedPolicy, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import { getArnPrincipal, tryGetContextArns } from './util/arn.js';
+import { getArnPrincipal, tryGetContextArns } from './util/arn.ts';
 
 /**
  * Stack to grant access to a remote roles to have access to either
