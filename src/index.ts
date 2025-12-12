@@ -1,6 +1,6 @@
 import { App } from 'aws-cdk-lib';
-import { OdrConsole } from './console.js';
-import { OdrDatasets } from './dataset.js';
+import { OdrConsole } from './console.ts';
+import { OdrDatasets } from './dataset.ts';
 
 const app = new App();
 

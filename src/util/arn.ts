@@ -1,4 +1,5 @@
-import { Arn, ArnComponents, ArnFormat, Stack } from 'aws-cdk-lib';
+import { Arn, ArnFormat, Stack } from 'aws-cdk-lib';
+import type { ArnComponents } from 'aws-cdk-lib';
 import { ArnPrincipal, CompositePrincipal } from 'aws-cdk-lib/aws-iam';
 
 /**

@@ -5,8 +5,8 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageCla
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
-import { getArnPrincipal, tryGetContextArns } from './util/arn.js';
-import { titleCase } from './util/names.js';
+import { getArnPrincipal, tryGetContextArns } from './util/arn.ts';
+import { titleCase } from './util/names.ts';
 
 export class OdrDatasets extends Stack {
   datasets: {
