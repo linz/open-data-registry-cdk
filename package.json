@@ -13,10 +13,10 @@
   "license": "ISC",
   "devDependencies": {
     "@linzjs/cdk-tags": "^1.7.1",
-    "@linzjs/style": "^4.2.0",
+    "@linzjs/style": "^6.0.0",
     "@types/node": "^24.1.0",
     "aws-cdk": "^2.90.0",
-    "aws-cdk-lib": "^2.90.0",
+    "aws-cdk-lib": "^2.262.1",
     "constructs": "^10.2.69",
     "tsx": "^3.12.7"
   },
