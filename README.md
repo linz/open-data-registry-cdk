@@ -55,7 +55,7 @@ LINZ uses a AWS EKS kubernetes cluster for all of its elevation and imagery proc
 
 - [linz/topo-workflows](https://github.com/linz/topo-workflows) - Argo Workflows
 - [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utility containers
-- [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery and elevation processing containers
+- [linz/geoprocessor](https://github.com/linz/geoprocessor) - Imagery and elevation processing containers
 
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)). This role has the permission to write data into the main dataset bucket.
 
