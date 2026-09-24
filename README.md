@@ -4,8 +4,8 @@
 
 LINZ has a growing collection of publicly available datasets:
 
-- ~500 GB of _elevation models_ in the form of Limited Error Raster Compression (LERC) Cloud Optimized GeoTIFFs (COGs)
-- ~20 TB of _satellite and aerial imagery_ in the form of losslessly compressed WebP COGs.
+- ~3.5 TB of _elevation models_ in the form of Limited Error Raster Compression (LERC) Cloud Optimized GeoTIFFs (COGs)
+- ~95 TB of _satellite and aerial imagery_ in the form of losslessly compressed WebP COGs and losslessly compressed ZSTD near-infrared COGs.
 
 These datasets are stored in AWS S3 with associated [STAC metadata](https://stacspec.org/).
 
@@ -54,8 +54,8 @@ To grant LINZ users access to the standalone AWS ODR account a LINZ managed bast
 LINZ uses a AWS EKS kubernetes cluster for all of its elevation and imagery processing:
 
 - [linz/topo-workflows](https://github.com/linz/topo-workflows) - Argo Workflows
-- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utility containers
-- [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery and elevation processing containers
+- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo Workflows utility containers
+- [linz/geoprocessor](https://github.com/linz/geoprocessor) - imagery/elevation and point cloud processing containers
 
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)). This role has the permission to write data into the main dataset bucket.
 
@@ -65,7 +65,7 @@ This EKS Cluster has been given access to assume a role `role/DataMaintainer` in
 
 The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk).
 
-To deploy, [NodeJs](https://nodejs.org/en) >=22.x is needed.
+To deploy, [NodeJs](https://nodejs.org/en) >=24.11 is needed.
 
 Install dependencies
 
