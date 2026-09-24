@@ -54,8 +54,8 @@ To grant LINZ users access to the standalone AWS ODR account a LINZ managed bast
 LINZ uses a AWS EKS kubernetes cluster for all of its elevation and imagery processing:
 
 - [linz/topo-workflows](https://github.com/linz/topo-workflows) - Argo Workflows
-- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo utility containers
-- [linz/topo-imagery](https://github.com/linz/topo-imagery) - Imagery and elevation processing containers
+- [linz/argo-tasks](https://github.com/linz/argo-tasks) - Argo Workflows utility containers
+- [linz/geoprocessor](https://github.com/linz/geoprocessor) - imagery/elevation and point cloud processing containers
 
 This EKS Cluster has been given access to assume a role `role/DataMaintainer` inside of the LINZ's ODR account ([dataset.ts](./src/dataset.ts)). This role has the permission to write data into the main dataset bucket.
 
@@ -65,7 +65,7 @@ This EKS Cluster has been given access to assume a role `role/DataMaintainer` in
 
 The infrastructure in this repository is managed with [AWS CDK](https://github.com/aws/aws-cdk).
 
-To deploy, [NodeJs](https://nodejs.org/en) >=22.x is needed.
+To deploy, [NodeJs](https://nodejs.org/en) >=24.11 is needed.
 
 Install dependencies
 
