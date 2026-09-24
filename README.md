@@ -4,8 +4,8 @@
 
 LINZ has a growing collection of publicly available datasets:
 
-- ~500 GB of _elevation models_ in the form of Limited Error Raster Compression (LERC) Cloud Optimized GeoTIFFs (COGs)
-- ~20 TB of _satellite and aerial imagery_ in the form of losslessly compressed WebP COGs.
+- ~3.5 TB of _elevation models_ in the form of Limited Error Raster Compression (LERC) Cloud Optimized GeoTIFFs (COGs)
+- ~95 TB of _satellite and aerial imagery_ in the form of losslessly compessed WebP COGs and losslessly compressed ZSTD near-infrared COGs.
 
 These datasets are stored in AWS S3 with associated [STAC metadata](https://stacspec.org/).
 
