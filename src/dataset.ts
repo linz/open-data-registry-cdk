@@ -5,6 +5,7 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageCla
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
+
 import { getArnPrincipal, tryGetContextArns } from './util/arn.ts';
 import { titleCase } from './util/names.ts';
 
@@ -24,7 +25,13 @@ export class OdrDatasets extends Stack {
     super(scope, id, props);
 
     // Allow testing with `--context dataset-suffix="-non-prod"`
-    const suffix = scope.node.tryGetContext('dataset-suffix') ?? '';
+    const contextSuffix: unknown = scope.node.tryGetContext('dataset-suffix');
+
+    if (contextSuffix != null && typeof contextSuffix !== 'string') {
+      throw new Error('Dataset suffix must be a string');
+    }
+
+    const suffix = contextSuffix ?? '';
 
     this.logBucket = new Bucket(this, 'Logs', {
       bucketName: props.logBucketName + suffix,
@@ -37,7 +44,9 @@ export class OdrDatasets extends Stack {
 
     this.datasets = props.datasets.map((ds) => {
       const datasetName = ds + suffix;
-      if (datasetName.includes('.')) throw new Error(`Dataset name must not contain ".": ${datasetName}`);
+      if (datasetName.includes('.')) {
+        throw new Error(`Dataset name must not contain ".": ${datasetName}`);
+      }
       const datasetTitle = titleCase(datasetName);
 
       const topic = new Topic(this, 'ObjectCreated' + datasetTitle, {

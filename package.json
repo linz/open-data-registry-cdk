@@ -1,24 +1,31 @@
 {
   "name": "open-data-registry-cdk",
   "version": "1.0.0",
-  "description": "",
   "private": true,
-  "scripts": {
-    "lint": "eslint . --quiet --fix --ignore-path .gitignore",
-    "test": "node --test src/**/*.test.ts"
-  },
+  "description": "",
   "keywords": [],
+  "license": "ISC",
   "author": "",
   "type": "module",
-  "license": "ISC",
+  "scripts": {
+    "lint": "npx concurrently \"npm run lint:oxlint\" \"npm run lint:fmt\" \"tsc\"",
+    "lint:oxlint": "oxlint .",
+    "lint:fmt": "oxfmt --check .",
+    "format": "oxfmt .",
+    "test": "node --test src/**/*.test.ts"
+  },
   "devDependencies": {
     "@linzjs/cdk-tags": "^1.7.1",
-    "@linzjs/style": "^6.0.0",
+    "@linzjs/style": "^6.1.1",
     "@types/node": "^24.1.0",
     "aws-cdk": "^2.90.0",
     "aws-cdk-lib": "^2.262.1",
+    "concurrently": "^10.0.6",
     "constructs": "^10.2.69",
-    "tsx": "^3.12.7"
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": "^24.11.0"
