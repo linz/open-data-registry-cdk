@@ -18,7 +18,7 @@
     "@linzjs/cdk-tags": "^1.7.1",
     "@linzjs/style": "^6.1.1",
     "@types/node": "^24.1.0",
-    "aws-cdk": "^2.90.0",
+    "aws-cdk": "^2.1146.0",
     "aws-cdk-lib": "^2.262.1",
     "concurrently": "^10.0.6",
     "constructs": "^10.2.69",
