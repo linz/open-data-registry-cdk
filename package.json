@@ -14,7 +14,7 @@
   "devDependencies": {
     "@linzjs/cdk-tags": "^1.7.1",
     "@linzjs/style": "^4.2.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^26.6.4",
     "aws-cdk": "^2.90.0",
     "aws-cdk-lib": "^2.90.0",
     "constructs": "^10.2.69",
