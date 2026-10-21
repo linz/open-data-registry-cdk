@@ -1,9 +1,45 @@
 version: 2
 
 updates:
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: github-actions
+    directory: /
+    open-pull-requests-limit: 5
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+      time: '07:30'
+      timezone: Pacific/Auckland
     cooldown:
       default-days: 15
+    commit-message:
+      prefix: build(deps)
+    groups:
+      actions-minor-and-patch:
+        applies-to: version-updates
+        patterns: ['*']
+        update-types: [minor, patch]
+  - package-ecosystem: npm
+    directory: /
+    open-pull-requests-limit: 5
+    schedule:
+      interval: weekly
+      day: monday
+      time: '07:30'
+      timezone: Pacific/Auckland
+    cooldown:
+      default-days: 15
+    commit-message:
+      prefix: build(deps)
+    groups:
+      aws-cdk:
+        patterns:
+          - 'aws-cdk'
+          - 'aws-cdk-lib'
+          - 'constructs'
+      dev-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+      npm-minor-and-patch:
+        applies-to: version-updates
+        patterns: ['*']
+        update-types: [minor, patch]
