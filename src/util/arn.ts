@@ -1,5 +1,4 @@
-import { Arn, ArnFormat, Stack } from 'aws-cdk-lib';
-import type { ArnComponents } from 'aws-cdk-lib';
+import { Arn, ArnFormat, type ArnComponents, type Stack } from 'aws-cdk-lib';
 import { ArnPrincipal, CompositePrincipal } from 'aws-cdk-lib/aws-iam';
 
 /**
@@ -29,21 +28,21 @@ export function validateRoleArn(arn: unknown): ArnComponents {
  * @throws {Error} If arn is invalid
  */
 export function tryGetContextArn(stack: Stack, context: string): string | null {
-  const ctx = stack.node.tryGetContext(context);
+  const ctx: unknown = stack.node.tryGetContext(context);
   if (ctx == null) return null;
+  if (typeof ctx !== 'string') throw new Error('Failed to parse ARN, is not a string');
   validateRoleArn(ctx);
   return ctx;
 }
 
 /**
- *
  * Lookup a list of role ARNs from context
  *
  * @throws {Error} If any arn is invalid
  * @returns arns if they are valid, null otherwise
  */
 export function tryGetContextArns(stack: Stack, context: string): string[] | null {
-  const ctx = stack.node.tryGetContext(context);
+  const ctx: unknown = stack.node.tryGetContext(context);
   if (ctx == null) return null;
   if (!Array.isArray(ctx)) throw new Error('Failed to parse ARN, is not a string[]');
   for (const arn of ctx) validateRoleArn(arn);
