@@ -5,7 +5,8 @@ import { AccountPrincipal, AnyPrincipal, Effect, PolicyStatement, Role, StarPrin
 import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Topic } from 'aws-cdk-lib/aws-sns';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
+
 import { getArnPrincipal, tryGetContextArns } from './util/arn.ts';
 import { titleCase } from './util/names.ts';
 
@@ -25,7 +26,8 @@ export class OdrDatasets extends Stack {
     super(scope, id, props);
 
     // Allow testing with `--context dataset-suffix="-non-prod"`
-    const suffix = scope.node.tryGetContext('dataset-suffix') ?? '';
+    const contextSuffix: unknown = scope.node.tryGetContext('dataset-suffix');
+    const suffix = typeof contextSuffix === 'string' ? contextSuffix : '';
 
     this.logBucket = new Bucket(this, 'Logs', {
       bucketName: props.logBucketName + suffix,
