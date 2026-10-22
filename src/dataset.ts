@@ -1,5 +1,6 @@
 import { applyTags, SecurityClassification } from '@linzjs/cdk-tags';
-import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
 import { AccountPrincipal, AnyPrincipal, Effect, PolicyStatement, Role, StarPrincipal } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, HttpMethods, StorageClass } from 'aws-cdk-lib/aws-s3';
 import { SnsDestination } from 'aws-cdk-lib/aws-s3-notifications';
