@@ -1,4 +1,5 @@
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Stack } from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
 import { ManagedPolicy, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import { getArnPrincipal, tryGetContextArns } from './util/arn.ts';
