@@ -4,7 +4,11 @@
   "description": "",
   "private": true,
   "scripts": {
-    "lint": "eslint . --quiet --fix --ignore-path .gitignore",
+    "lint": "npm run lint:oxlint && npm run lint:fmt && tsc --noEmit",
+    "lint:oxlint": "oxlint --deny-warnings",
+    "lint:fmt": "oxfmt --check .",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --write .",
     "test": "node --test src/**/*.test.ts"
   },
   "keywords": [],
