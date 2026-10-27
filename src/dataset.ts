@@ -27,7 +27,12 @@ export class OdrDatasets extends Stack {
 
     // Allow testing with `--context dataset-suffix="-non-prod"`
     const contextSuffix: unknown = scope.node.tryGetContext('dataset-suffix');
-    const suffix = typeof contextSuffix === 'string' ? contextSuffix : '';
+
+    if (contextSuffix != null && typeof contextSuffix !== 'string') {
+      throw new Error('data-suffix must be a string');
+    }
+
+    const suffix = contextSuffix ?? '';
 
     this.logBucket = new Bucket(this, 'Logs', {
       bucketName: props.logBucketName + suffix,
