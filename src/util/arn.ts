@@ -44,7 +44,9 @@ export function tryGetContextArn(stack: Stack, context: string): string | null {
 export function tryGetContextArns(stack: Stack, context: string): string[] | null {
   const ctx: unknown = stack.node.tryGetContext(context);
   if (ctx == null) return null;
-  if (!Array.isArray(ctx)) throw new Error('Failed to parse ARN, is not a string[]');
+  if (!Array.isArray(ctx) || !ctx.every((arn): arn is string => typeof arn === 'string')) {
+    throw new Error('Failed to parse ARN, is not a string[]');
+  }
   for (const arn of ctx) validateRoleArn(arn);
   return ctx;
 }
