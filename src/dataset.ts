@@ -29,7 +29,7 @@ export class OdrDatasets extends Stack {
     const contextSuffix: unknown = scope.node.tryGetContext('dataset-suffix');
 
     if (contextSuffix != null && typeof contextSuffix !== 'string') {
-      throw new Error('data-suffix must be a string');
+      throw new Error('dataset-suffix must be a string');
     }
 
     const suffix = contextSuffix ?? '';
