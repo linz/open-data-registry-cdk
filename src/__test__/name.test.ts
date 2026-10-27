@@ -1,5 +1,6 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
+import { describe, it } from 'node:test';
+
 import { titleCase } from '../util/names.ts';
 
 describe('titleCase', () => {
