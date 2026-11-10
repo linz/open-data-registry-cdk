@@ -3,3 +3,10 @@ build/
 cdk.out/
 cdk.context.json
 tsconfig.tsbuildinfo
+
+.claude/
+CLAUDE.local.md
+.idea/
+.vscode/
+.DS_Store
+.env
