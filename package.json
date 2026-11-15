@@ -22,7 +22,7 @@
     "aws-cdk": "^2.1147.0",
     "aws-cdk-lib": "^2.275.0",
     "constructs": "^10.2.69",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": "^24.11.0"
